@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny,IsAuthenticated
 from .serializers import RegisterSerializer,LoginSerializer,UserSerializer
 from rest_framework.response import Response
 from django.http import JsonResponse
@@ -37,3 +37,18 @@ def login_user(request):
         'access':str(refresh.access_token),
         'user':UserSerializer(user).data
     }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout_user(request):
+    try:
+        refresh_token = request.data.get('refresh')
+        if not refresh_token:
+            return Response({'error':'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+
+        return Response({"Message":'SucceSsfully logged out'},status=status.HTTP_200_0K)
+    except Exception as e:
+        return Response({'error': 'Invalid refresh Token'}, status=status.HTTP_400_BAD_REQUEST)
