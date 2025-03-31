@@ -52,3 +52,11 @@ def logout_user(request):
         return Response({"Message":'SucceSsfully logged out'},status=status.HTTP_200_0K)
     except Exception as e:
         return Response({'error': 'Invalid refresh Token'}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_details(request):
+    user = request.user
+    serializer = UserSerializer(user)
+    return Response(serializer.data)
